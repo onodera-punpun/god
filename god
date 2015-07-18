@@ -26,6 +26,8 @@ custom_poll()    { default_poll    "$@"; }
 
 # This function defines all the stuff that happens on boot
 on_boot() {
+	echo -e "Dear God, dear God, tinkle tinkle hoy!\n"
+
 	echo Mounting API filesystem.
 	mountpoint -q /proc  || mount -t proc proc /proc -o nosuid,noexec,nodev
 	mountpoint -q /sys   || mount -t sysfs sys /sys -o nosuid,noexec,nodev
@@ -34,6 +36,9 @@ on_boot() {
 	mkdir -p /dev/pts /dev/shm
 	mountpoint -q /dev/pts || mount -t devpts devpts /dev/pts -o mode=0620,gid=5,nosuid,noexec
 	mountpoint -q /dev/shm || mount -t tmpfs shm /dev/shm -o mode=1777,nosuid,nodev
+
+	echo Creating tmpfs.
+	mount -t tmpfs tmpfs /tmp -o mode=1777,nosuid,nodev
 
 	echo Setting up loopback device.
 	/sbin/ip link set up dev lo
