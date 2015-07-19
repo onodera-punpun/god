@@ -26,7 +26,7 @@ custom_poll()    { default_poll    "$@"; }
 
 # This function defines all the stuff that happens on boot
 on_boot() {
-	echo -e "Dear God, dear God, tinkle tinkle hoy!\n"
+	echo -e "\nDear God, dear God, tinkle tinkle hoy!\n"
 
 	echo Mounting API filesystem.
 	mountpoint -q /proc  || mount -t proc proc /proc -o nosuid,noexec,nodev
@@ -54,11 +54,10 @@ on_boot() {
 	echo Setting system clock.
 	/sbin/hwclock --hctosys
 
-	echo Mounting.
+	echo Mounting fstab.
 	mount -a
 	mount -o remount,rw /
 
-	# Start the default daemons
 	echo Starting daemons.
 	for dmn in $ENABLED; do
 		if [ $(echo $dmn | awk '{ s=substr($0, 1, 1); print s; }') = '@' ]; then
@@ -67,6 +66,11 @@ on_boot() {
 			custom_start "$dmn"
 		fi
 	done
+
+	echo Spawing gettys.
+	/sbin/mingetty -8 --loginpause 38400 tty1 linux &
+	/sbin/mingetty -8 --loginpause 38400 tty2 linux &
+	/sbin/mingetty -8 --loginpause 38400 tty3 linux &
 }
 
 # This function defines all the stuff that happens on shutdown
@@ -77,8 +81,21 @@ on_shutdown() {
 	echo Shutting down eudev.
 	killall udevd
 
+	 echo Sending all processes the TERM signal.
+	killall -TERM
+	sleep 3
+
+	echo Sending all processes the KILL signal.
+	killall -KILL
+
 	echo Unmounting API filesystem.
 	umount -r /run
+
+	echo Unmounting fstab.
+	umount -a -r
+
+	echo Remounting root read-only.
+	mount -o remount,ro /
 }
 
 # This function starts daemons
@@ -222,25 +239,14 @@ case "$1" in
 		echo "        --start           starts daemons"
 		echo "        --stop            stops daemons"
 		echo "        --restart         restars daemons"
+		echo "        --init            boots system, don't use this"
+		echo "        --shutdown        shutdown system"
+		echo "        --reboot          reboots system"
 		echo "  -v,   --version         print version and exit"
 		echo "  -h,   --help            print help and exit"
 		;;
 	-v|--version)
 		echo god 0.1
-		;;
-	--init)
-		on_boot
-		;;
-	--shutdown)
-		on_shutdown
-		;;
-	--start|--stop|--restart)
-		cmd="$1"
-
-		shift
-		for dmn in ${@:-$DAEMONS}; do
-			custom_${cmd} "$dmn"
-		done
 		;;
 	-l|--list)
 		for dmn in $DAEMONS; do
@@ -250,6 +256,28 @@ case "$1" in
 				echo_color 0 [ ] $dmn
 			fi
 		done
+		;;
+	--start|--stop|--restart)
+		cmd="$1"
+
+		shift
+		for dmn in ${@:-$DAEMONS}; do
+			custom_${cmd} "$dmn"
+		done
+		;;
+	--init)
+		on_boot
+		;;
+	--shutdown)
+		on_shutdown
+		busybox poweroff -f
+		;;
+	--reboot)
+		on_shutdown
+		busybox reboot -f
+		;;
+	--suspend)
+		echo mem > /sys/power/state
 		;;
 	*)
 		echo Invalid option, use -h for help.
