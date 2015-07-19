@@ -67,10 +67,10 @@ on_boot() {
 		fi
 	done
 
-	echo Spawing gettys.
-	/sbin/mingetty -8 --loginpause 38400 tty1 linux &
-	/sbin/mingetty -8 --loginpause 38400 tty2 linux &
-	/sbin/mingetty -8 --loginpause 38400 tty3 linux &
+	sleep 3
+	/sbin/agetty --login-pause -8 -s 38400 tty1 linux &
+	/sbin/agetty -8 -s 38400 tty2 linux &
+	/sbin/agetty -8 -s 38400 tty3 linux &
 }
 
 # This function defines all the stuff that happens on shutdown
