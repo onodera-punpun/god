@@ -67,7 +67,7 @@ on_boot() {
 		fi
 	done
 
-	/sbin/agetty --noclear --login-pause -8 -s 38400 tty1 linux &
+	/sbin/agetty -8 -s 38400 tty1 linux &
 	/sbin/agetty -8 -s 38400 tty2 linux &
 	/sbin/agetty -8 -s 38400 tty3 linux &
 }
@@ -261,7 +261,7 @@ case "$1" in
 
 		shift
 		for dmn in ${@:-$DAEMONS}; do
-			custom_${cmd} "$dmn"
+			custom_$(echo $cmd | sed "s/--//g") "$dmn"
 		done
 		;;
 	--init)
