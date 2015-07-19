@@ -82,11 +82,11 @@ on_shutdown() {
 	killall udevd
 
 	 echo Sending all processes the TERM signal.
-	killall -TERM
+	/sbin/busybox killall5 -TERM
 	sleep 3
 
 	echo Sending all processes the KILL signal.
-	killall -KILL
+	/sbin/busybox killall5 -KILL
 
 	echo Unmounting API filesystem.
 	umount -r /run
@@ -270,11 +270,11 @@ case "$1" in
 		;;
 	--shutdown)
 		on_shutdown
-		busybox poweroff -f
+		/sbin/busybox poweroff -f
 		;;
 	--reboot)
 		on_shutdown
-		busybox reboot -f
+		/sbin/busybox reboot -f
 		;;
 	--suspend)
 		echo mem > /sys/power/state
