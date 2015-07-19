@@ -67,8 +67,7 @@ on_boot() {
 		fi
 	done
 
-	sleep 3
-	/sbin/agetty --login-pause -8 -s 38400 tty1 linux &
+	/sbin/agetty --noclear --login-pause -8 -s 38400 tty1 linux &
 	/sbin/agetty -8 -s 38400 tty2 linux &
 	/sbin/agetty -8 -s 38400 tty3 linux &
 }
