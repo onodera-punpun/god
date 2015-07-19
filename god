@@ -67,6 +67,7 @@ on_boot() {
 		fi
 	done
 
+	sleep 1
 	/sbin/agetty -8 -s 38400 tty1 linux &
 	/sbin/agetty -8 -s 38400 tty2 linux &
 	/sbin/agetty -8 -s 38400 tty3 linux &
@@ -218,7 +219,15 @@ default_poll() {
 	esac
 }
 
+check_root() {
+	if [ "$(id -u)" != "0" ]; then
+	   echo god: Operation not permitted.
+	   exit 1
+	fi
+}
+
 # This fucntion echoes stuff in color
+# TODO: Remove this
 echo_color() {
 	color="$1"
 	shift
@@ -257,6 +266,8 @@ case "$1" in
 		done
 		;;
 	--start|--stop|--restart)
+		check_root
+
 		cmd="$1"
 
 		shift
@@ -265,17 +276,25 @@ case "$1" in
 		done
 		;;
 	--init)
+		check_root
+
 		on_boot
 		;;
 	--shutdown)
+		check_root
+
 		on_shutdown
 		/sbin/busybox poweroff -f
 		;;
 	--reboot)
+		check_root
+
 		on_shutdown
 		/sbin/busybox reboot -f
 		;;
 	--suspend)
+		check_root
+
 		echo mem > /sys/power/state
 		;;
 	*)
