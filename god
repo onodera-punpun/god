@@ -250,11 +250,7 @@ case "$1" in
 		echo "        --init            boots system, don't use this"
 		echo "        --shutdown        shutdown system"
 		echo "        --reboot          reboots system"
-		echo "  -v,   --version         print version and exit"
 		echo "  -h,   --help            print help and exit"
-		;;
-	-v|--version)
-		echo god 0.1
 		;;
 	-l|--list)
 		for dmn in $DAEMONS; do
