@@ -29,14 +29,15 @@ on_boot() {
 	echo -e "\nDear God, dear God, tinkle tinkle hoy!\n"
 
 	echo Mounting API filesystem.
-	mountpoint -q /proc  || mount -t proc proc /proc -o nosuid,noexec,nodev
-	mountpoint -q /sys   || mount -t sysfs sys /sys -o nosuid,noexec,nodev
-	mountpoint -q /dev   || mount -t devtmpfs dev /dev -o mode=0755,nosuid
+	mountpoint -q /proc    || mount -t proc proc /proc -o nosuid,noexec,nodev
+	mountpoint -q /sys     || mount -t sysfs sys /sys -o nosuid,noexec,nodev
+	mountpoint -q /var/run || mount -t tmpfs run /run -o mode=0775,nosuid,nodev
+	mountpoint -q /dev     || mount -t devtmpfs dev /dev -o mode=0755,nosuid
 	mkdir -p /dev/pts /dev/shm
 	mountpoint -q /dev/pts || mount -t devpts devpts /dev/pts -o mode=0620,gid=5,nosuid,noexec
 	mountpoint -q /dev/shm || mount -t tmpfs shm /dev/shm -o mode=1777,nosuid,nodev
 
-	echo Creating tmpfs.
+	echo Mounting tmpfs.
 	mount -t tmpfs tmpfs /tmp -o mode=1777,nosuid,nodev
 
 	echo Setting up loopback device.
@@ -67,7 +68,9 @@ on_boot() {
 	done
 
 	sleep 1
-	/sbin/agetty -8 -s 38400 tty1 linux &
+	echo
+	read -p "Press return to continue." answer
+ 	/sbin/agetty -8 -s 38400 tty1 linux &
 	/sbin/agetty -8 -s 38400 tty2 linux &
 	/sbin/agetty -8 -s 38400 tty3 linux &
 }
@@ -88,7 +91,7 @@ on_shutdown() {
 	/sbin/busybox killall5 -KILL
 
 	echo Unmounting API filesystem.
-	umount -r /run
+	umount -r /var/run
 
 	echo Unmounting fstab.
 	umount -a -r
@@ -114,8 +117,8 @@ default_start() {
 			su -s /bin/sh -c 'bitlbee -F' bitlbee
 			;;
 		dbus)
-			mkdir -p /var/run/dbus/dbus.pid
-			bus-uuidgen --ensure 
+			mkdir -p /var/run/dbus
+			dbus-uuidgen --ensure 
 			dbus-daemon --system
 			;;
 		iptables)
