@@ -31,7 +31,6 @@ on_boot() {
 	echo Mounting API filesystem.
 	mountpoint -q /proc  || mount -t proc proc /proc -o nosuid,noexec,nodev
 	mountpoint -q /sys   || mount -t sysfs sys /sys -o nosuid,noexec,nodev
-	mountpoint -q /run   || mount -t tmpfs run /run -o mode=0755,nosuid,nodev
 	mountpoint -q /dev   || mount -t devtmpfs dev /dev -o mode=0755,nosuid
 	mkdir -p /dev/pts /dev/shm
 	mountpoint -q /dev/pts || mount -t devpts devpts /dev/pts -o mode=0620,gid=5,nosuid,noexec
@@ -114,9 +113,8 @@ default_start() {
 		bitlbee)
 			su -s /bin/sh -c 'bitlbee -F' bitlbee
 			;;
-		# TODO: Fix for CRUX
 		dbus)
-			mkdir -p /run/dbus
+			mkdir -p /var/run/dbus/dbus.pid
 			bus-uuidgen --ensure 
 			dbus-daemon --system
 			;;
@@ -126,7 +124,6 @@ default_start() {
 		sshd)
 			/usr/bin/sshd
 			;;
-		# TODO: Use sdhcp
 		dhcpcd)
 			if ip link | grep -Fq $NETWORK_INTERFACE; then :; else
 				echo "Waiting for $NETWORK_INTERFACE to settle."
@@ -167,13 +164,10 @@ default_stop() {
 		alsa)
 			alsactl store
 			;;
-		# TODO: Fix for CRUX
 		dbus)
 			killall dbus-launch
 			killall dbus-daemon
-			# TODO: Check out why the /run doesn't work
 			rm /var/run/dbus/dbus.pid
-			rm /run/dbus/pid
 			;;
 		iptables)
 			for table in $(cat /proc/net/ip_tables_names); do
@@ -207,9 +201,7 @@ default_poll() {
 		iptables)
 			iptables -L -n | grep -m 1 -q '^ACCEPT\|^REJECT'
 			;;
-		# TODO: Fix for CRUX
 		dbus)
-			#test -e /run/dbus/pid;;
 			test -e /var/run/dbus/dbus.pid
 			;;
 		*)
