@@ -244,6 +244,7 @@ case "$1" in
 		echo "        --restart         restars daemons"
 		echo "        --init            boots system, don't use this"
 		echo "        --shutdown        shutdown system"
+		echo "  -s,   --suspend         suspends system"
 		echo "        --reboot          reboots system"
 		echo "  -h,   --help            print help and exit"
 		;;
