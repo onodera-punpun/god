@@ -125,7 +125,7 @@ default_start() {
 			iptables-restore < /etc/iptables/iptables.rules
 			;;
 		sshd)
-			/usr/bin/sshd
+			/usr/sbin/sshd
 			;;
 		dhcpcd)
 			if ip link | grep -Fq $NETWORK_INTERFACE; then :; else
