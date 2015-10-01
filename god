@@ -128,7 +128,7 @@ default_start() {
 			sndiod -v 127
 			;;
 		sshd)
-			/usr/bin/sshd
+			/usr/sbin/sshd
 			;;
 		dhcpcd)
 			if ip link | grep -Fq $NETWORK_INTERFACE; then :; else
