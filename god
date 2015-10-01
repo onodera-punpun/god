@@ -182,6 +182,7 @@ default_stop() {
 			;;
 		sndio)
 			pkill sndiod
+			;;
 		*)
 			# Fallback: kill all processes with the name of the command
 			killall "$1"
