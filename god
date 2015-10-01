@@ -124,8 +124,11 @@ default_start() {
 		iptables)
 			iptables-restore < /etc/iptables/iptables.rules
 			;;
+		sndio)
+			sndiod -v 127
+			;;
 		sshd)
-			/usr/sbin/sshd
+			/usr/bin/sshd
 			;;
 		dhcpcd)
 			if ip link | grep -Fq $NETWORK_INTERFACE; then :; else
@@ -177,6 +180,8 @@ default_stop() {
 				iptables-restore < /var/lib/iptables/empty-$table.rules
 			done
 			;;
+		sndio)
+			pkill sndiod
 		*)
 			# Fallback: kill all processes with the name of the command
 			killall "$1"
