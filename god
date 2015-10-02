@@ -124,6 +124,9 @@ default_start() {
 		iptables)
 			iptables-restore < /etc/iptables/iptables.rules
 			;;
+		oss)
+			soundon
+			;;
 		sndio)
 			sndiod -v 127
 			;;
@@ -174,6 +177,9 @@ default_stop() {
 			killall dbus-launch
 			killall dbus-daemon
 			rm /var/run/dbus/dbus.pid
+			;;
+		oss)
+			soundoff
 			;;
 		iptables)
 			for table in $(cat /proc/net/ip_tables_names); do
