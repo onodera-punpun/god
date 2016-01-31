@@ -263,9 +263,9 @@ case "$1" in
 	-l|--list)
 		for dmn in $DAEMONS; do
 			if custom_poll "$dmn" >/dev/null 2>&1; then
-				echo_color 2 [X] $dmn
+				echo_color 2 [✓] $dmn
 			else
-				echo_color 0 [ ] $dmn
+				echo_color 1 [✘] $dmn
 			fi
 		done
 		;;
